@@ -81,17 +81,33 @@ def main(report, report_name):
     multi_core_scores = [GEEKBENCH_RESULTS[k][1] for k in GEEKBENCH_RESULTS.keys()]
     with plt.xkcd():
         fig, ax = plt.subplots()
-        ax.set_title(f"Geekbench 6 results")
-        ax.set_xlabel("Score")
+        ax.set_title(f"Geekbench 6 results", color=report_config["globals"]["colors"][0])
+        ax.set_xlabel("Score", color=report_config["globals"]["colors"][0])
         y_values = np.arange(len(GEEKBENCH_RESULTS))
         ax.set_yticks(y_values + 0.2)  # Adjust y-ticks to be in the middle of the bars
         ax.set_yticklabels(GEEKBENCH_RESULTS.keys())
-        ax.barh(y_values - 0.2, single_core_scores, height=0.4, label="Single-Core")  # Adjust y-values and set height
-        ax.barh(y_values + 0.2, multi_core_scores, height=0.4, label="Multi-Core")  # Adjust y-values and set height
+        ax.barh(y_values - 0.2, single_core_scores, height=0.4, label="Single-Core", color=report_config["globals"]["colors"][0])  # Adjust y-values and set height
+        ax.barh(y_values + 0.2, multi_core_scores, height=0.4, label="Multi-Core", color=report_config["globals"]["colors"][1])  # Adjust y-values and set height
         ax.grid(False, axis="x")
-        ax.legend()
+        # ax.grid(True, axis="y", color=report_config["globals"]["colors"][0])
+        legend = ax.legend()
         plt.tight_layout() 
-        # plt.show()
+
+        # Change the font color
+        ax.tick_params(colors=report_config["globals"]["colors"][0])
+        for label in ax.get_xticklabels():
+            label.set_color(report_config["globals"]["colors"][0])
+        for label in ax.get_yticklabels():
+            label.set_color(report_config["globals"]["colors"][0])
+        for text in legend.get_texts():
+            text.set_color(report_config["globals"]["colors"][0])
+        ax.spines['bottom'].set_color(report_config["globals"]["colors"][0])
+        ax.spines['top'].set_color(report_config["globals"]["colors"][0]) 
+        ax.spines['right'].set_color(report_config["globals"]["colors"][0])
+        ax.spines['left'].set_color(report_config["globals"]["colors"][0])
+        
+
+        plt.show()
 
         REPORT_MARKDOWN += f"## Geekbench 6 results for {report_name} \n\n"
         REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
