@@ -21,6 +21,7 @@ ureg.define("MBps = 1 * megabyte / second")
 ureg.define("KBps = 1 * kilobyte / second")
 ureg.define("workmonth = 160 * hour")
 ureg.define("workweek = 40 * hour")
+ureg.define("workyear = 12 * workmonth")
 
 
 mallory_ultra = FontProperties()
@@ -111,6 +112,8 @@ def main(report, report_name):
     assert gb6["version"] == 6
     GEEKBENCH_RESULTS[local_hardware["name"]] = [gb6["single"], gb6["multi"]]
     FIO_RESULTS[local_hardware["name"]] = [ureg(f'{fio["speed_rw"]} {fio["speed_units"]}').to("MBps") for fio in local_hardware_yabs["fio"]]
+    PRICING_RESULTS[local_hardware["name"]] = ureg(local_hardware["price"]).to("USD / month")
+    # PRICING_RESULTS.move_to_end(local_hardware["name"], last=False)
 
 
     single_core_scores = [GEEKBENCH_RESULTS[k][0] for k in GEEKBENCH_RESULTS.keys()]

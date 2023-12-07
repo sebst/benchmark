@@ -10,7 +10,8 @@
   "localHardware": [
     {
         "name": "MacBook Air (M2)",
-        "file": "2023-12-07-nifr-mbair"
+        "file": "2023-12-07-nifr-mbair",
+        "price": "1499 USD / (3 * workyear)"
     }
   ],
   "contestants": [
@@ -27,10 +28,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Amsterdam)",
-        "price": "0.07143 USD / hour",
-        "pricePerHour": {"EUR": "TODO"},
-        "pricePerMonth": {"EUR": "TODO"},
-        "pricePer160hrs": {"EUR": "TODO"}
+        "price": "0.07143 USD / hour"
     },
     {
         "name": "Linode",
@@ -39,10 +37,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Amsterdam)",
-        "price": "0.072 USD / hour",
-        "pricePerHour": {"EUR": "TODO"},
-        "pricePerMonth": {"EUR": "TODO"},
-        "pricePer160hrs": {"EUR": "TODO"}
+        "price": "0.072 USD / hour"
     },
     {
         "name": "Vultr",
@@ -51,10 +46,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Amsterdam)",
-        "price": "0.060 USD / hour",
-        "pricePerHour": {"EUR": "TODO"},
-        "pricePerMonth": {"EUR": "TODO"},
-        "pricePer160hrs": {"EUR": "TODO"}
+        "price": "0.060 USD / hour"
     },
     {
         "name": "Hetzner (x86)",
@@ -63,10 +55,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe Central (Falkenstein)",
-        "price": "0.0219 USD / hour",
-        "pricePerHour": {"EUR": "TODO"},
-        "pricePerMonth": {"EUR": "TODO"},
-        "pricePer160hrs": {"EUR": "TODO"}
+        "price": "0.0219 USD / hour"
     },
     {
         "name": "Hetzner (ARM)",
@@ -75,10 +64,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe Central (Falkenstein)",
-        "price": "0.0101 USD / hour",
-        "pricePerHour": {"EUR": "TODO"},
-        "pricePerMonth": {"EUR": "TODO"},
-        "pricePer160hrs": {"EUR": "TODO"}
+        "price": "0.0101 USD / hour"
     },
     {
         "name": "AWS (Lightsail)",
@@ -87,10 +73,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Paris)",
-        "price": "80 USD / month",
-        "pricePerHour": {"EUR": "TODO"},
-        "pricePerMonth": {"EUR": "TODO"},
-        "pricePer160hrs": {"EUR": "TODO"}
+        "price": "80 USD / month"
     },
     {
         "name": "GCP (Compute Engine)",
@@ -99,10 +82,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Brussels)",
-        "price": "0.13 USD / hour",
-        "pricePerHour": {"EUR": "TODO"},
-        "pricePerMonth": {"EUR": "TODO"},
-        "pricePer160hrs": {"EUR": "TODO"}
+        "price": "0.13 USD / hour"
     }
 ]
 }
