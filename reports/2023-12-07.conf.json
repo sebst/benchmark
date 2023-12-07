@@ -1,9 +1,11 @@
 {
   "globals": {
-    "1EUR=": 1.08,
+    "currencies": {
+        "EUR": "1.08 USD"
+    },
     "asof": "2020-12-07",
     "colors": ["#291E95", "#CC007A"],
-    "watermark": "bas.codes"
+    "watermark": "devcontainer.com"
   },
   "localHardware": [
     {
@@ -15,6 +17,7 @@
     {
         "name": "GitHub Codespaces",
         "file": "2023-12-07-githubcodespaces-4vcpu",
+        "price": "0.36 USD / hour",
         "vCPUshared": true
     },
     { 
@@ -24,6 +27,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Amsterdam)",
+        "price": "0.07143 USD / hour",
         "pricePerHour": {"EUR": "TODO"},
         "pricePerMonth": {"EUR": "TODO"},
         "pricePer160hrs": {"EUR": "TODO"}
@@ -35,6 +39,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Amsterdam)",
+        "price": "0.072 USD / hour",
         "pricePerHour": {"EUR": "TODO"},
         "pricePerMonth": {"EUR": "TODO"},
         "pricePer160hrs": {"EUR": "TODO"}
@@ -46,6 +51,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Amsterdam)",
+        "price": "0.060 USD / hour",
         "pricePerHour": {"EUR": "TODO"},
         "pricePerMonth": {"EUR": "TODO"},
         "pricePer160hrs": {"EUR": "TODO"}
@@ -57,6 +63,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe Central (Falkenstein)",
+        "price": "0.0219 USD / hour",
         "pricePerHour": {"EUR": "TODO"},
         "pricePerMonth": {"EUR": "TODO"},
         "pricePer160hrs": {"EUR": "TODO"}
@@ -68,6 +75,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe Central (Falkenstein)",
+        "price": "0.0101 USD / hour",
         "pricePerHour": {"EUR": "TODO"},
         "pricePerMonth": {"EUR": "TODO"},
         "pricePer160hrs": {"EUR": "TODO"}
@@ -79,6 +87,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Paris)",
+        "price": "80 USD / month",
         "pricePerHour": {"EUR": "TODO"},
         "pricePerMonth": {"EUR": "TODO"},
         "pricePer160hrs": {"EUR": "TODO"}
@@ -90,6 +99,7 @@
         "vCPUs": 4,
         "RAM": 8,
         "region": "Europe West (Brussels)",
+        "price": "0.13 USD / hour",
         "pricePerHour": {"EUR": "TODO"},
         "pricePerMonth": {"EUR": "TODO"},
         "pricePer160hrs": {"EUR": "TODO"}
