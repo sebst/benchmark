@@ -35,27 +35,20 @@ def main(report, report_name):
     GEEKBENCH_RESULTS = {}
 
     for contestant in contestants:
-        # print(contestant["name"])
-
         REPORT_MARKDOWN += f"## {contestant['name']} \n\n"
 
-        # print(contestant["file"])
         contestant_yabs = json.load(open(SCRIPT_PATH / '..' / 'benchmark-results' / contestant["file"]))
-        # print(contestant_yabs["version"])
         vcpus = contestant_yabs["cpu"]["cores"]
         ram = (contestant_yabs["mem"]["ram"] * ureg(contestant_yabs["mem"]["ram_units"])).to("GB")
         ram = floor(ram.magnitude) * ureg("GB")
-        print(f"vCPUs: {vcpus} RAM: {ram.to('GB')}")
 
         data = [
             ["", "vCPUs", "RAM (GB)", "shared", "IPv4", "IPv6"],
             [contestant["name"], str(vcpus), str(ram.magnitude), ("✅" if contestant["vCPUshared"] else "❌"), ("✅" if contestant_yabs["net"]["ipv4"] else "❌"), ("✅" if contestant_yabs["net"]["ipv6"] else "❌")],
         ]
-        # print(data)
         table = table_from_string_list(data, Alignment.CENTER)
         markdown = generate_markdown(table) #.replace("✅ ", "✅").replace("❌ ", "❌")
         REPORT_MARKDOWN += markdown + "\n\n"
-
 
         data = [
             ["CPU Model", contestant_yabs["cpu"]["model"]],
@@ -83,26 +76,7 @@ def main(report, report_name):
     assert gb6["version"] == 6
     GEEKBENCH_RESULTS[local_hardware["name"]] = [gb6["single"], gb6["multi"]]
 
-    # make a bar plot with the results in GEEKBENCH_RESULTS, so that the key is on the left and the bars are horizontal
-    # with plt.xkcd():
-    #     fig, ax = plt.subplots()
-    #     ax.set_title(f"Geekbench 6 results")
-    #     ax.set_xlabel("Score")
-    #     # ax.set_ylabel("Contestant")
-    #     ax.set_yticks(np.arange(len(GEEKBENCH_RESULTS)))
-    #     ax.set_yticklabels(GEEKBENCH_RESULTS.keys())
-    #     # ax.set_xlim([0, 10000])
-    #     # ax.set_xticks(np.arange(0, 10000, 1000))
-    #     # ax.set_xticklabels(np.arange(0, 10000, 1000))
-    #     # ax.barh(list(GEEKBENCH_RESULTS.keys()), [GEEKBENCH_RESULTS[k][0] for k in GEEKBENCH_RESULTS.keys()], label="Single-Core")
-    #     # ax.barh(list(GEEKBENCH_RESULTS.keys()), [GEEKBENCH_RESULTS[k][1] for k in GEEKBENCH_RESULTS.keys()], label="Multi-Core")
-    #     single_core_scores = [GEEKBENCH_RESULTS[k][0] for k in GEEKBENCH_RESULTS.keys()]
-    #     multi_core_scores = [GEEKBENCH_RESULTS[k][1] for k in GEEKBENCH_RESULTS.keys()]
-    #     ax.barh(list(GEEKBENCH_RESULTS.keys()), single_core_scores, label="Single-Core")
-    #     ax.barh(list(GEEKBENCH_RESULTS.keys()), multi_core_scores, left=single_core_scores, label="Multi-Core")
-    #     ax.grid(True, axis="x")
-    #     plt.tight_layout() 
-    #     plt.show()
+
     single_core_scores = [GEEKBENCH_RESULTS[k][0] for k in GEEKBENCH_RESULTS.keys()]
     multi_core_scores = [GEEKBENCH_RESULTS[k][1] for k in GEEKBENCH_RESULTS.keys()]
     with plt.xkcd():
@@ -119,12 +93,9 @@ def main(report, report_name):
         plt.tight_layout() 
         # plt.show()
 
-        # save plt to svg string:
         REPORT_MARKDOWN += f"## Geekbench 6 results for {report_name} \n\n"
         REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
 
-
-    # print( REPORT_MARKDOWN)
     with open(f"{report}.report.md", "w") as f:
         f.write(REPORT_MARKDOWN)
 
@@ -133,10 +104,3 @@ if __name__ == "__main__":
     REPORT = "2023-12-07"
     REPORT_NAME = "December 2023"
     main(REPORT, REPORT_NAME)
-
-
-
-
-# speeds = [ureg("1.0 GiB/s").to("MB/s"), ureg("2 GiB/s").to("MB/s")]
-# print(speeds)
-# print(avg(speeds))
