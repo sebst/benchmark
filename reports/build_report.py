@@ -5,6 +5,7 @@ from statistics import mean as avg
 from math import floor
 from io import StringIO
 from collections import OrderedDict
+from textwrap import dedent
 
 from pint import UnitRegistry
 from markdown_table_generator import Alignment, generate_markdown, table_from_string_list
@@ -21,7 +22,10 @@ ureg.define("MBps = 1 * megabyte / second")
 ureg.define("KBps = 1 * kilobyte / second")
 ureg.define("workmonth = 160 * hour")
 ureg.define("workweek = 40 * hour")
+ureg.define("workfortnight = 2 * workweek")
 ureg.define("workyear = 12 * workmonth")
+ureg.define("EUR = [currency]")
+ureg.define("USD = [currency]")
 
 
 mallory_ultra = FontProperties()
@@ -34,23 +38,21 @@ def fig_to_svg(fig):
     svg = StringIO()
     fig.savefig(svg, format="svg")
     svg.seek(0)
-    return ""
+    # return ""
     return svg.read()
 
 
-def main(report, report_name):
-
-    REPORT_MARKDOWN = f"# {report_name} \n\n\n"
-
+def main(report):
     report_config = json.load(open(SCRIPT_PATH / f"{report}.conf.json"))
-    ureg.define("EUR = [currency]")
-    ureg.define("USD = [currency]")
     # ureg.define("€ = [currency]")
     # ureg.define("$ = [currency]")
     # ureg.define("USD = 1 * $")
     # ureg.define("EUR = 1 * €")
     for currency, exchange_rate in report_config["globals"]["currencies"].items():
         ureg.define(f"{currency} = {exchange_rate}")
+    report_name = report_config["globals"]["name"]
+
+    REPORT_MARKDOWN = f"# {report_name} \n\n\n"
 
     contestants = report_config["contestants"]
 
@@ -58,6 +60,7 @@ def main(report, report_name):
     FIO_RESULTS = OrderedDict()
     IPERF_RESULTS = OrderedDict()
     PRICING_RESULTS = OrderedDict()
+    ALL_DATA = list()
 
     for contestant in contestants:
         REPORT_MARKDOWN += f"## {contestant['name']} \n\n"
@@ -71,11 +74,15 @@ def main(report, report_name):
             ["", "vCPUs", "RAM (GB)", "shared", "IPv4", "IPv6"],
             [contestant["name"], str(vcpus), str(ram.magnitude), ("✅" if contestant["vCPUshared"] else "❌"), ("✅" if contestant_yabs["net"]["ipv4"] else "❌"), ("✅" if contestant_yabs["net"]["ipv6"] else "❌")],
         ]
+        if len(ALL_DATA) == 0:
+            ALL_DATA.append(data[0])
+        ALL_DATA.append(data[1])
         table = table_from_string_list(data, Alignment.CENTER)
         markdown = generate_markdown(table) #.replace("✅ ", "✅").replace("❌ ", "❌")
         REPORT_MARKDOWN += markdown + "\n\n"
 
         data = [
+            ["", "Value"],
             ["CPU Model", contestant_yabs["cpu"]["model"]],
             ["CPU Frequency", f"{contestant_yabs['cpu']['freq']}"],
             ["ASN", contestant_yabs["ip_info"]["asn"]],
@@ -88,7 +95,7 @@ def main(report, report_name):
             ["Price per work-month", f'{ureg(contestant["price"]).to("USD / workmonth").magnitude}'],
             ["Price per month", f'{ureg(contestant["price"]).to("USD / month").magnitude}'],
         ]
-        table = table_from_string_list(data, Alignment.CENTER)
+        table = table_from_string_list(data, Alignment.LEFT)
         markdown = generate_markdown(table)
         REPORT_MARKDOWN += markdown + "\n\n"
 
@@ -149,7 +156,7 @@ def main(report, report_name):
         # ax.text(0.5, 0.5, report_config["globals"]["watermark"], fontsize=40, color='gray', ha='center', va='center', alpha=0.1)
         fig.text(0.2, 0.1, report_config["globals"]["watermark"], fontsize=20, color='gray', ha='center', va='center', alpha=0.2, fontproperties=mallory_ultra)
 
-        plt.show()
+        # plt.show()
 
         REPORT_MARKDOWN += f"## Geekbench 6 results for {report_name} \n\n"
         REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
@@ -187,11 +194,14 @@ def main(report, report_name):
         fig.text(0.2, 0.1, report_config["globals"]["watermark"], fontsize=20, color='gray', ha='center', va='center', alpha=0.2, fontproperties=mallory_ultra)
 
 
-        plt.show()
+        # plt.show()
+
+        REPORT_MARKDOWN += f"## Disk speed results for {report_name} \n\n"
+        REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
 
 
     with plt.xkcd():
-        price_display_unit = "USD / workweek"
+        price_display_unit = "USD / workfortnight"
         fig, ax = plt.subplots()
         ax.set_title(f"Pricing report", color=report_config["globals"]["colors"][0])
         ax.set_xlabel(f"Price [{price_display_unit}]", color=report_config["globals"]["colors"][0])
@@ -201,7 +211,7 @@ def main(report, report_name):
         bars = ax.barh(y_values, [price.to(price_display_unit).magnitude for price in PRICING_RESULTS.values()], height=0.4, color=report_config["globals"]["colors"][0])
         for i, bar in enumerate(bars):
             width = bar.get_width()
-            t1 = [f'$ {price.to("USD / hour").magnitude:.2f} / hr' for price in PRICING_RESULTS.values()][i]
+            t1 = [f'$ {price.to("USD / hour").magnitude:.4f} / hr' for price in PRICING_RESULTS.values()][i]
             t2 = [f'$ {price.to("USD / workmonth").magnitude:.2f} / workmonth' for price in PRICING_RESULTS.values()][i]
             ax.text(width + 0.1, 
                     bar.get_y() + bar.get_height() / 2, 
@@ -231,8 +241,21 @@ def main(report, report_name):
         # ax.text(0.5, 0.5, report_config["globals"]["watermark"], fontsize=40, color='gray', ha='center', va='center', alpha=0.1)
         fig.text(0.2, 0.1, report_config["globals"]["watermark"], fontsize=20, color='gray', ha='center', va='center', alpha=0.2, fontproperties=mallory_ultra)
 
-        plt.show()
+        # plt.show()
 
+        REPORT_MARKDOWN += f"## Pricing results for {report_name} \n\n"
+        REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
+
+    table = table_from_string_list(ALL_DATA, Alignment.CENTER)
+    markdown = generate_markdown(table) #.replace("✅ ", "✅").replace("❌ ", "❌")
+    REPORT_MARKDOWN += markdown + "\n\n"
+
+    asof = report_config["globals"]["asof"]
+    exchange_rate = f"1 EUR = {ureg('1 EUR').to('USD'):.4f}"
+    notes_on_prices = f"""
+    Pricing is approximate based on the hourly rates published by the providers. The displayed prices are without VAT, do not include promotions, saving plans or other non-standard deductions, as of {asof} and denominated in US-Dollar based on an exchange rate of {exchange_rate} at the time of writing.
+    """
+    REPORT_MARKDOWN += dedent(notes_on_prices) + "\n\n"
 
     with open(f"{report}.report.md", "w") as f:
         f.write(REPORT_MARKDOWN)
@@ -240,8 +263,7 @@ def main(report, report_name):
 
 if __name__ == "__main__":
     REPORT = "2023-12-07"
-    REPORT_NAME = "December 2023"
-    main(REPORT, REPORT_NAME)
+    main(REPORT)
 
     eur_2_usd = ureg("2 EUR").to("USD")
     print(f"{eur_2_usd=}")

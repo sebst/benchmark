@@ -1,5 +1,6 @@
 {
   "globals": {
+    "name": "Report of December 2023",
     "currencies": {
         "EUR": "1.08 USD"
     },
