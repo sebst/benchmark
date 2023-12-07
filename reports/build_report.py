@@ -18,6 +18,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 SCRIPT_PATH = Path(SCRIPT_DIR)
 
 ureg = UnitRegistry()
+ℝ = ureg
 ureg.define("MBps = 1 * megabyte / second")
 ureg.define("KBps = 1 * kilobyte / second")
 ureg.define("workmonth = 160 * hour")
@@ -67,8 +68,8 @@ def main(report):
 
         contestant_yabs = json.load(open(SCRIPT_PATH / '..' / 'benchmark-results' / contestant["file"]))
         vcpus = contestant_yabs["cpu"]["cores"]
-        ram = (contestant_yabs["mem"]["ram"] * ureg(contestant_yabs["mem"]["ram_units"])).to("GB")
-        ram = floor(ram.magnitude) * ureg("GB")
+        ram = (contestant_yabs["mem"]["ram"] * ℝ(contestant_yabs["mem"]["ram_units"])).to("GB")
+        ram = floor(ram.magnitude) * ℝ("GB")
 
         data = [
             ["", "vCPUs", "RAM (GB)", "shared", "IPv4", "IPv6"],
@@ -91,9 +92,9 @@ def main(report):
             ["HyperVisor", contestant_yabs["os"]["vm"]],
             ["Time", contestant_yabs["time"]],
             ["Geekbench Score", f'[Single: {contestant_yabs["geekbench"][0]["single"]}<br />Multi: {contestant_yabs["geekbench"][0]["multi"]}]({contestant_yabs["geekbench"][0]["url"]})'],
-            ["Price per hour", f'{ureg(contestant["price"]).to("USD / hour").magnitude}'],
-            ["Price per work-month", f'{ureg(contestant["price"]).to("USD / workmonth").magnitude}'],
-            ["Price per month", f'{ureg(contestant["price"]).to("USD / month").magnitude}'],
+            ["Price per hour", f'{ℝ(contestant["price"]).to("USD / hour").magnitude}'],
+            ["Price per work-month", f'{ℝ(contestant["price"]).to("USD / workmonth").magnitude}'],
+            ["Price per month", f'{ℝ(contestant["price"]).to("USD / month").magnitude}'],
         ]
         table = table_from_string_list(data, Alignment.LEFT)
         markdown = generate_markdown(table)
@@ -106,10 +107,10 @@ def main(report):
         
         fios = contestant_yabs["fio"]
         block_sizes = [fio["bs"] for fio in fios]
-        fios_rw = [ureg(f'{fio["speed_rw"]} {fio["speed_units"]}').to("MBps") for fio in fios]
+        fios_rw = [ℝ(f'{fio["speed_rw"]} {fio["speed_units"]}').to("MBps") for fio in fios]
         FIO_RESULTS[contestant["name"]] = fios_rw
 
-        PRICING_RESULTS[contestant["name"]] = ureg(contestant["price"]).to("USD / month")
+        PRICING_RESULTS[contestant["name"]] = ℝ(contestant["price"]).to("USD / month")
 
 
 
@@ -118,8 +119,8 @@ def main(report):
     gb6 = local_hardware_yabs["geekbench"].pop()
     assert gb6["version"] == 6
     GEEKBENCH_RESULTS[local_hardware["name"]] = [gb6["single"], gb6["multi"]]
-    FIO_RESULTS[local_hardware["name"]] = [ureg(f'{fio["speed_rw"]} {fio["speed_units"]}').to("MBps") for fio in local_hardware_yabs["fio"]]
-    PRICING_RESULTS[local_hardware["name"]] = ureg(local_hardware["price"]).to("USD / month")
+    FIO_RESULTS[local_hardware["name"]] = [ℝ(f'{fio["speed_rw"]} {fio["speed_units"]}').to("MBps") for fio in local_hardware_yabs["fio"]]
+    PRICING_RESULTS[local_hardware["name"]] = ℝ(local_hardware["price"]).to("USD / month")
     # PRICING_RESULTS.move_to_end(local_hardware["name"], last=False)
 
 
@@ -251,7 +252,7 @@ def main(report):
     REPORT_MARKDOWN += markdown + "\n\n"
 
     asof = report_config["globals"]["asof"]
-    exchange_rate = f"1 EUR = {ureg('1 EUR').to('USD'):.4f}"
+    exchange_rate = f"1 EUR = {ℝ('1 EUR').to('USD'):.4f}"
     notes_on_prices = f"""
     Pricing is approximate based on the hourly rates published by the providers. The displayed prices are without VAT, do not include promotions, saving plans or other non-standard deductions, as of {asof} and denominated in US-Dollar based on an exchange rate of {exchange_rate} at the time of writing.
     """
@@ -265,7 +266,7 @@ if __name__ == "__main__":
     REPORT = "2023-12-07"
     main(REPORT)
 
-    eur_2_usd = ureg("2 EUR").to("USD")
+    eur_2_usd = ℝ("2 EUR").to("USD")
     print(f"{eur_2_usd=}")
-    usd2eur = ureg("3 USD").to("USD")
+    usd2eur = ℝ("3 USD").to("USD")
     print(f"{usd2eur=}")
