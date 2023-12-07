@@ -1,0 +1,96 @@
+{
+  "globals": {
+    "1EUR=": 1.08,
+    "asof": "2020-12-07"
+  },
+  "localHardware": [
+    {
+        "name": "MacBook Air (M2)",
+        "file": "2023-12-07-nifr-mbair"
+    }
+  ],
+  "contestants": [
+    {
+        "name": "GitHub Codespaces",
+        "file": "2023-12-07-githubcodespaces-4vcpu",
+        "vCPUshared": true
+    },
+    { 
+        "name": "DigtalOcean",
+        "file": "2023-12-07-do-reg-4vcpu-8gb-ams3",
+        "vCPUshared": true,
+        "vCPUs": 4,
+        "RAM": 8,
+        "region": "Europe West (Amsterdam)",
+        "pricePerHour": {"EUR": "TODO"},
+        "pricePerMonth": {"EUR": "TODO"},
+        "pricePer160hrs": {"EUR": "TODO"}
+    },
+    {
+        "name": "Linode",
+        "file": "2023-12-07-linode-shared-4vcpu-8gb-ams",
+        "vCPUshared": true,
+        "vCPUs": 4,
+        "RAM": 8,
+        "region": "Europe West (Amsterdam)",
+        "pricePerHour": {"EUR": "TODO"},
+        "pricePerMonth": {"EUR": "TODO"},
+        "pricePer160hrs": {"EUR": "TODO"}
+    },
+    {
+        "name": "Vultr",
+        "file": "2023-12-07-vultr-cc-intelreg-4vcpu-8gb-ams",
+        "vCPUshared": true,
+        "vCPUs": 4,
+        "RAM": 8,
+        "region": "Europe West (Amsterdam)",
+        "pricePerHour": {"EUR": "TODO"},
+        "pricePerMonth": {"EUR": "TODO"},
+        "pricePer160hrs": {"EUR": "TODO"}
+    },
+    {
+        "name": "Hetzner (x86)",
+        "file": "2023-12-07-hetzner-sharedamd-4vcpu-8gb-fsn",
+        "vCPUshared": true,
+        "vCPUs": 4,
+        "RAM": 8,
+        "region": "Europe Central (Falkenstein)",
+        "pricePerHour": {"EUR": "TODO"},
+        "pricePerMonth": {"EUR": "TODO"},
+        "pricePer160hrs": {"EUR": "TODO"}
+    },
+    {
+        "name": "Hetzner (ARM)",
+        "file": "2023-12-07-hetzner-ampere-4vcpu-8gb-fsn",
+        "vCPUshared": true,
+        "vCPUs": 4,
+        "RAM": 8,
+        "region": "Europe Central (Falkenstein)",
+        "pricePerHour": {"EUR": "TODO"},
+        "pricePerMonth": {"EUR": "TODO"},
+        "pricePer160hrs": {"EUR": "TODO"}
+    },
+    {
+        "name": "AWS (Lightsail)",
+        "file": "2023-12-07-lightsail-4vcpu-16gb-paris",
+        "vCPUshared": true,
+        "vCPUs": 4,
+        "RAM": 8,
+        "region": "Europe West (Paris)",
+        "pricePerHour": {"EUR": "TODO"},
+        "pricePerMonth": {"EUR": "TODO"},
+        "pricePer160hrs": {"EUR": "TODO"}
+    },
+    {
+        "name": "GCP (Compute Engine)",
+        "file": "2023-12-07-gcp-genp-e2-4vcpu-8gb-euwest1b",
+        "vCPUshared": true,
+        "vCPUs": 4,
+        "RAM": 8,
+        "region": "Europe West (Brussels)",
+        "pricePerHour": {"EUR": "TODO"},
+        "pricePerMonth": {"EUR": "TODO"},
+        "pricePer160hrs": {"EUR": "TODO"}
+    }
+]
+}
