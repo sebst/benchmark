@@ -58,6 +58,7 @@ def main(report, report_name):
             ["Kernel", contestant_yabs["os"]["kernel"]],
             ["HyperVisor", contestant_yabs["os"]["vm"]],
             ["Time", contestant_yabs["time"]],
+            ["Geekbench Score", f'[Single: {contestant_yabs["geekbench"][0]["single"]}<br />Multi: {contestant_yabs["geekbench"][0]["multi"]}]({contestant_yabs["geekbench"][0]["url"]})'],
         ]
         table = table_from_string_list(data, Alignment.CENTER)
         markdown = generate_markdown(table)
@@ -86,8 +87,8 @@ def main(report, report_name):
         y_values = np.arange(len(GEEKBENCH_RESULTS))
         ax.set_yticks(y_values + 0.2)  # Adjust y-ticks to be in the middle of the bars
         ax.set_yticklabels(GEEKBENCH_RESULTS.keys())
-        ax.barh(y_values - 0.2, single_core_scores, height=0.4, label="Single-Core", color=report_config["globals"]["colors"][0])  # Adjust y-values and set height
-        ax.barh(y_values + 0.2, multi_core_scores, height=0.4, label="Multi-Core", color=report_config["globals"]["colors"][1])  # Adjust y-values and set height
+        ax.barh(y_values - 0.2, single_core_scores, height=0.4, label="single core", color=report_config["globals"]["colors"][0])  # Adjust y-values and set height
+        ax.barh(y_values + 0.2, multi_core_scores, height=0.4, label="multi core", color=report_config["globals"]["colors"][1])  # Adjust y-values and set height
         ax.grid(False, axis="x")
         # ax.grid(True, axis="y", color=report_config["globals"]["colors"][0])
         legend = ax.legend()
@@ -106,6 +107,9 @@ def main(report, report_name):
         ax.spines['right'].set_color(report_config["globals"]["colors"][0])
         ax.spines['left'].set_color(report_config["globals"]["colors"][0])
         
+        # Watermark
+        # ax.text(0.5, 0.5, report_config["globals"]["watermark"], fontsize=40, color='gray', ha='center', va='center', alpha=0.1)
+        fig.text(0.2, 0.1, report_config["globals"]["watermark"], fontsize=20, color='gray', ha='center', va='center', alpha=0.2, fontname='Helvetica')
 
         plt.show()
 

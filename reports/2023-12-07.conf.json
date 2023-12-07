@@ -2,7 +2,8 @@
   "globals": {
     "1EUR=": 1.08,
     "asof": "2020-12-07",
-    "colors": ["#291E95", "#CC007A"]
+    "colors": ["#291E95", "#CC007A"],
+    "watermark": "bas.codes"
   },
   "localHardware": [
     {
