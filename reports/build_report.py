@@ -17,6 +17,13 @@ SCRIPT_PATH = Path(SCRIPT_DIR)
 ureg = UnitRegistry()
 
 
+def fig_to_svg(fig):
+    svg = StringIO()
+    fig.savefig(svg, format="svg")
+    svg.seek(0)
+    return svg.read()
+
+
 def main(report, report_name):
 
     REPORT_MARKDOWN = f"# {report_name} \n\n\n"
@@ -41,13 +48,28 @@ def main(report, report_name):
         print(f"vCPUs: {vcpus} RAM: {ram.to('GB')}")
 
         data = [
-            ["", "vCPUs", "RAM", "shared", "IPv4", "IPv6"],
-            [contestant["name"], str(vcpus), str(ram), ("✅" if contestant["vCPUshared"] else "❌"), ("✅" if contestant_yabs["net"]["ipv4"] else "❌"), ("✅" if contestant_yabs["net"]["ipv6"] else "❌")],
+            ["", "vCPUs", "RAM (GB)", "shared", "IPv4", "IPv6"],
+            [contestant["name"], str(vcpus), str(ram.magnitude), ("✅" if contestant["vCPUshared"] else "❌"), ("✅" if contestant_yabs["net"]["ipv4"] else "❌"), ("✅" if contestant_yabs["net"]["ipv6"] else "❌")],
         ]
         # print(data)
         table = table_from_string_list(data, Alignment.CENTER)
+        markdown = generate_markdown(table) #.replace("✅ ", "✅").replace("❌ ", "❌")
+        REPORT_MARKDOWN += markdown + "\n\n"
+
+
+        data = [
+            ["CPU Model", contestant_yabs["cpu"]["model"]],
+            ["CPU Frequency", f"{contestant_yabs['cpu']['freq']}"],
+            ["ASN", contestant_yabs["ip_info"]["asn"]],
+            ["OS", contestant_yabs["os"]["distro"]],
+            ["Kernel", contestant_yabs["os"]["kernel"]],
+            ["HyperVisor", contestant_yabs["os"]["vm"]],
+            ["Time", contestant_yabs["time"]],
+        ]
+        table = table_from_string_list(data, Alignment.CENTER)
         markdown = generate_markdown(table)
         REPORT_MARKDOWN += markdown + "\n\n"
+
         
         gb6 = contestant_yabs["geekbench"].pop()
         assert gb6["version"] == 6
@@ -95,16 +117,11 @@ def main(report, report_name):
         ax.grid(False, axis="x")
         ax.legend()
         plt.tight_layout() 
-        plt.show()
+        # plt.show()
 
         # save plt to svg string:
-        svg = StringIO()
-        fig.savefig(svg, format="svg")
-        svg.seek(0)
         REPORT_MARKDOWN += f"## Geekbench 6 results for {report_name} \n\n"
-        REPORT_MARKDOWN += svg.read() + "\n\n"
-        print(svg)
-        del svg
+        REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
 
 
     # print( REPORT_MARKDOWN)
