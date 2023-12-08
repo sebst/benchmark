@@ -43,6 +43,113 @@ def fig_to_svg(fig):
     return svg.read()
 
 
+def graph_ci(report_config, fig, ax, legend):
+    # Change the font color
+    ax.tick_params(colors=report_config["globals"]["colors"][0])
+    for label in ax.get_xticklabels():
+        label.set_color(report_config["globals"]["colors"][0])
+    for label in ax.get_yticklabels():
+        label.set_color(report_config["globals"]["colors"][0])
+    for text in legend.get_texts():
+        text.set_color(report_config["globals"]["colors"][0])
+    ax.spines['bottom'].set_color(report_config["globals"]["colors"][0])
+    ax.spines['top'].set_color(report_config["globals"]["colors"][0]) 
+    ax.spines['right'].set_color(report_config["globals"]["colors"][0])
+    ax.spines['left'].set_color(report_config["globals"]["colors"][0])
+
+    # Watermark
+    # ax.text(0.5, 0.5, report_config["globals"]["watermark"], fontsize=40, color='gray', ha='center', va='center', alpha=0.1)
+    fig.text(0.2, 0.1, report_config["globals"]["watermark"], fontsize=20, color='gray', ha='center', va='center', alpha=0.2, fontproperties=mallory_ultra)
+    return fig, ax
+
+
+def graph_geekbench(report_config, GEEKBENCH_RESULTS):
+    single_core_scores = [GEEKBENCH_RESULTS[k][0] for k in GEEKBENCH_RESULTS.keys()]
+    multi_core_scores = [GEEKBENCH_RESULTS[k][1] for k in GEEKBENCH_RESULTS.keys()]
+    with plt.xkcd():
+        fig, ax = plt.subplots()
+        ax.set_title(f"Geekbench 6 Scores", color=report_config["globals"]["colors"][0])
+        ax.set_xlabel("Score", color=report_config["globals"]["colors"][0])
+        y_values = np.arange(len(GEEKBENCH_RESULTS))
+        ax.set_yticks(y_values + 0.2)  # Adjust y-ticks to be in the middle of the bars
+        ax.set_yticklabels(GEEKBENCH_RESULTS.keys())
+        ax.barh(y_values - 0.2, single_core_scores, height=0.4, label="single core", color=report_config["globals"]["colors"][0])  # Adjust y-values and set height
+        ax.barh(y_values + 0.2, multi_core_scores, height=0.4, label="multi core", color=report_config["globals"]["colors"][1])  # Adjust y-values and set height
+        ax.grid(False, axis="x")
+        # ax.grid(True, axis="y", color=report_config["globals"]["colors"][0])
+        legend = ax.legend()
+        plt.tight_layout() 
+
+        fig, ax = graph_ci(report_config, fig, ax, legend)
+
+
+        return fig, ax
+
+
+def graph_fio(report_config, FIO_RESULTS):
+    with plt.xkcd():
+        fig, ax = plt.subplots()
+        ax.set_title(f"FIO report", color=report_config["globals"]["colors"][0])
+        ax.set_xlabel("RW Speed [MBps]", color=report_config["globals"]["colors"][0])
+        y_values = np.arange(len(FIO_RESULTS))
+        ax.set_yticks(y_values + 0.2)
+        ax.set_yticklabels(FIO_RESULTS.keys())
+        # 1 = 1   - 0*0.2
+        # 2 = 0.5 - 1*0.1
+        # 3 = 1/3 - 2*0.1
+
+        n = len(FIO_RESULTS)
+
+        ax.barh(y_values - 0.2*2, [fio[0].magnitude for fio in FIO_RESULTS.values()], height=0.2, label="0", color=report_config["globals"]["colors"][0])
+        ax.barh(y_values - 0.2*1, [fio[1].magnitude for fio in FIO_RESULTS.values()], height=0.2, label="1", color=report_config["globals"]["colors"][1])
+        ax.barh(y_values + 0.2*0, [fio[2].magnitude for fio in FIO_RESULTS.values()], height=0.2, label="2", color="green")
+        ax.barh(y_values + 0.2*1, [fio[3].magnitude for fio in FIO_RESULTS.values()], height=0.2, label="3", color="yellow")
+        
+        ax.grid(False, axis="x")
+        # ax.grid(True, axis="y", color=report_config["globals"]["colors"][0])
+        legend = ax.legend()
+        plt.tight_layout()
+
+        fig, ax = graph_ci(report_config, fig, ax, legend)
+
+
+        plt.show()
+
+        return fig, ax
+
+
+def graph_pricing(report_config, PRICING_RESULTS):
+    with plt.xkcd():
+        price_display_unit = "USD / workfortnight"
+        fig, ax = plt.subplots()
+        ax.set_title(f"Pricing report", color=report_config["globals"]["colors"][0])
+        ax.set_xlabel(f"Price [{price_display_unit}]", color=report_config["globals"]["colors"][0])
+        y_values = np.arange(len(PRICING_RESULTS))
+        ax.set_yticks(y_values)
+        ax.set_yticklabels(PRICING_RESULTS.keys())
+        bars = ax.barh(y_values, [price.to(price_display_unit).magnitude for price in PRICING_RESULTS.values()], height=0.4, color=report_config["globals"]["colors"][0])
+        for i, bar in enumerate(bars):
+            width = bar.get_width()
+            t1 = [f'$ {price.to("USD / hour").magnitude:.4f} / hr' for price in PRICING_RESULTS.values()][i]
+            t2 = [f'$ {price.to("USD / workmonth").magnitude:.2f} / workmonth' for price in PRICING_RESULTS.values()][i]
+            ax.text(width + 0.1, 
+                    bar.get_y() + bar.get_height() / 2, 
+                    f'{t1}\n{t2}', 
+                    ha = 'left', 
+                    va = 'center',
+                    color = report_config["globals"]["colors"][0],
+                    fontsize=6)
+        ax.grid(False, axis="x")
+        legend = ax.legend()
+        plt.tight_layout()
+
+        fig, ax = graph_ci(report_config, fig, ax, legend)
+
+        # plt.show()
+
+        return fig, ax
+
+
 def main(report):
     report_config = json.load(open(SCRIPT_PATH / f"{report}.conf.json"))
     # ureg.define("€ = [currency]")
@@ -112,6 +219,8 @@ def main(report):
 
         PRICING_RESULTS[contestant["name"]] = ℝ(contestant["price"]).to("USD / month")
 
+        # break
+
 
 
     local_hardware = report_config["localHardware"].pop()
@@ -119,133 +228,25 @@ def main(report):
     gb6 = local_hardware_yabs["geekbench"].pop()
     assert gb6["version"] == 6
     GEEKBENCH_RESULTS[local_hardware["name"]] = [gb6["single"], gb6["multi"]]
-    FIO_RESULTS[local_hardware["name"]] = [ℝ(f'{fio["speed_rw"]} {fio["speed_units"]}').to("MBps") for fio in local_hardware_yabs["fio"]]
+    # FIO_RESULTS[local_hardware["name"]] = [ℝ(f'{fio["speed_rw"]} {fio["speed_units"]}').to("MBps") for fio in local_hardware_yabs["fio"]]
     PRICING_RESULTS[local_hardware["name"]] = ℝ(local_hardware["price"]).to("USD / month")
     # PRICING_RESULTS.move_to_end(local_hardware["name"], last=False)
 
 
-    single_core_scores = [GEEKBENCH_RESULTS[k][0] for k in GEEKBENCH_RESULTS.keys()]
-    multi_core_scores = [GEEKBENCH_RESULTS[k][1] for k in GEEKBENCH_RESULTS.keys()]
-    with plt.xkcd():
-        fig, ax = plt.subplots()
-        ax.set_title(f"Geekbench 6 Scores", color=report_config["globals"]["colors"][0])
-        ax.set_xlabel("Score", color=report_config["globals"]["colors"][0])
-        y_values = np.arange(len(GEEKBENCH_RESULTS))
-        ax.set_yticks(y_values + 0.2)  # Adjust y-ticks to be in the middle of the bars
-        ax.set_yticklabels(GEEKBENCH_RESULTS.keys())
-        ax.barh(y_values - 0.2, single_core_scores, height=0.4, label="single core", color=report_config["globals"]["colors"][0])  # Adjust y-values and set height
-        ax.barh(y_values + 0.2, multi_core_scores, height=0.4, label="multi core", color=report_config["globals"]["colors"][1])  # Adjust y-values and set height
-        ax.grid(False, axis="x")
-        # ax.grid(True, axis="y", color=report_config["globals"]["colors"][0])
-        legend = ax.legend()
-        plt.tight_layout() 
+    fig, ax = graph_geekbench(report_config, GEEKBENCH_RESULTS)
+    REPORT_MARKDOWN += f"## Geekbench 6 results for {report_name} \n\n"
+    REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
 
-        # Change the font color
-        ax.tick_params(colors=report_config["globals"]["colors"][0])
-        for label in ax.get_xticklabels():
-            label.set_color(report_config["globals"]["colors"][0])
-        for label in ax.get_yticklabels():
-            label.set_color(report_config["globals"]["colors"][0])
-        for text in legend.get_texts():
-            text.set_color(report_config["globals"]["colors"][0])
-        ax.spines['bottom'].set_color(report_config["globals"]["colors"][0])
-        ax.spines['top'].set_color(report_config["globals"]["colors"][0]) 
-        ax.spines['right'].set_color(report_config["globals"]["colors"][0])
-        ax.spines['left'].set_color(report_config["globals"]["colors"][0])
-
-        # Watermark
-        # ax.text(0.5, 0.5, report_config["globals"]["watermark"], fontsize=40, color='gray', ha='center', va='center', alpha=0.1)
-        fig.text(0.2, 0.1, report_config["globals"]["watermark"], fontsize=20, color='gray', ha='center', va='center', alpha=0.2, fontproperties=mallory_ultra)
-
-        # plt.show()
-
-        REPORT_MARKDOWN += f"## Geekbench 6 results for {report_name} \n\n"
-        REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
-
-    with plt.xkcd():
-        fig, ax = plt.subplots()
-        ax.set_title(f"FIO report", color=report_config["globals"]["colors"][0])
-        ax.set_xlabel("RW Speed [MBps]", color=report_config["globals"]["colors"][0])
-        y_values = np.arange(len(FIO_RESULTS))
-        ax.set_yticks(y_values + 0.2)
-        ax.set_yticklabels(FIO_RESULTS.keys())
-        ax.barh(y_values - 0.2, [fio[0].magnitude for fio in FIO_RESULTS.values()], height=0.4, label="0", color=report_config["globals"]["colors"][0])
-        ax.barh(y_values + 0.2, [fio[1].magnitude for fio in FIO_RESULTS.values()], height=0.4, label="1", color=report_config["globals"]["colors"][1])
-        
-        ax.grid(False, axis="x")
-        # ax.grid(True, axis="y", color=report_config["globals"]["colors"][0])
-        legend = ax.legend()
-        plt.tight_layout()
-
-        # Change the font color
-        ax.tick_params(colors=report_config["globals"]["colors"][0])
-        for label in ax.get_xticklabels():
-            label.set_color(report_config["globals"]["colors"][0])
-        for label in ax.get_yticklabels():
-            label.set_color(report_config["globals"]["colors"][0])
-        for text in legend.get_texts():
-            text.set_color(report_config["globals"]["colors"][0])
-        ax.spines['bottom'].set_color(report_config["globals"]["colors"][0])
-        ax.spines['top'].set_color(report_config["globals"]["colors"][0]) 
-        ax.spines['right'].set_color(report_config["globals"]["colors"][0])
-        ax.spines['left'].set_color(report_config["globals"]["colors"][0])
-
-        # Watermark
-        # ax.text(0.5, 0.5, report_config["globals"]["watermark"], fontsize=40, color='gray', ha='center', va='center', alpha=0.1)
-        fig.text(0.2, 0.1, report_config["globals"]["watermark"], fontsize=20, color='gray', ha='center', va='center', alpha=0.2, fontproperties=mallory_ultra)
+    
+    fig, ax = graph_fio(report_config, FIO_RESULTS)
+    REPORT_MARKDOWN += f"## Disk speed results for {report_name} \n\n"
+    REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
 
 
-        # plt.show()
+    fig, ax = graph_pricing(report_config, PRICING_RESULTS)
+    REPORT_MARKDOWN += f"## Pricing results for {report_name} \n\n"
+    REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
 
-        REPORT_MARKDOWN += f"## Disk speed results for {report_name} \n\n"
-        REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
-
-
-    with plt.xkcd():
-        price_display_unit = "USD / workfortnight"
-        fig, ax = plt.subplots()
-        ax.set_title(f"Pricing report", color=report_config["globals"]["colors"][0])
-        ax.set_xlabel(f"Price [{price_display_unit}]", color=report_config["globals"]["colors"][0])
-        y_values = np.arange(len(PRICING_RESULTS))
-        ax.set_yticks(y_values)
-        ax.set_yticklabels(PRICING_RESULTS.keys())
-        bars = ax.barh(y_values, [price.to(price_display_unit).magnitude for price in PRICING_RESULTS.values()], height=0.4, color=report_config["globals"]["colors"][0])
-        for i, bar in enumerate(bars):
-            width = bar.get_width()
-            t1 = [f'$ {price.to("USD / hour").magnitude:.4f} / hr' for price in PRICING_RESULTS.values()][i]
-            t2 = [f'$ {price.to("USD / workmonth").magnitude:.2f} / workmonth' for price in PRICING_RESULTS.values()][i]
-            ax.text(width + 0.1, 
-                    bar.get_y() + bar.get_height() / 2, 
-                    f'{t1}\n{t2}', 
-                    ha = 'left', 
-                    va = 'center',
-                    color = report_config["globals"]["colors"][0],
-                    fontsize=6)
-        ax.grid(False, axis="x")
-        legend = ax.legend()
-        plt.tight_layout()
-
-        # Change the font color
-        ax.tick_params(colors=report_config["globals"]["colors"][0])
-        for label in ax.get_xticklabels():
-            label.set_color(report_config["globals"]["colors"][0])
-        for label in ax.get_yticklabels():
-            label.set_color(report_config["globals"]["colors"][0])
-        for text in legend.get_texts():
-            text.set_color(report_config["globals"]["colors"][0])
-        ax.spines['bottom'].set_color(report_config["globals"]["colors"][0])
-        ax.spines['top'].set_color(report_config["globals"]["colors"][0]) 
-        ax.spines['right'].set_color(report_config["globals"]["colors"][0])
-        ax.spines['left'].set_color(report_config["globals"]["colors"][0])
-
-        # Watermark
-        # ax.text(0.5, 0.5, report_config["globals"]["watermark"], fontsize=40, color='gray', ha='center', va='center', alpha=0.1)
-        fig.text(0.2, 0.1, report_config["globals"]["watermark"], fontsize=20, color='gray', ha='center', va='center', alpha=0.2, fontproperties=mallory_ultra)
-
-        # plt.show()
-
-        REPORT_MARKDOWN += f"## Pricing results for {report_name} \n\n"
-        REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
 
     table = table_from_string_list(ALL_DATA, Alignment.CENTER)
     markdown = generate_markdown(table) #.replace("✅ ", "✅").replace("❌ ", "❌")
@@ -265,8 +266,3 @@ def main(report):
 if __name__ == "__main__":
     REPORT = "2023-12-07"
     main(REPORT)
-
-    eur_2_usd = ℝ("2 EUR").to("USD")
-    print(f"{eur_2_usd=}")
-    usd2eur = ℝ("3 USD").to("USD")
-    print(f"{usd2eur=}")
