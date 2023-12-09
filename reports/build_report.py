@@ -35,11 +35,27 @@ mallory_ultra.set_name('Mallory')
 mallory_ultra.set_style('normal')
 
 
+def try_ureg(value, unit=None):
+    # print(value, unit)
+    # return 12
+    if unit is not None:
+        to_parse = f"{value} {unit}"
+    else:
+        to_parse = value
+    try:
+
+        r = ℝ(to_parse)
+    except:
+        r = ℝ("1 ms")
+    print(value, unit, r)
+    return r
+
+
 def fig_to_svg(fig):
     svg = StringIO()
     fig.savefig(svg, format="svg")
     svg.seek(0)
-    # return ""
+    return ""
     return svg.read()
 
 
@@ -113,7 +129,7 @@ def graph_fio(report_config, FIO_RESULTS):
         fig, ax = graph_ci(report_config, fig, ax, legend)
 
 
-        plt.show()
+        # plt.show()
 
         return fig, ax
 
@@ -147,6 +163,29 @@ def graph_pricing(report_config, PRICING_RESULTS):
 
         # plt.show()
 
+        return fig, ax
+
+
+def graph_network_latency(report_config, NETWORK_LATENCY_RESULTS):
+    single_core_scores = [NETWORK_LATENCY_RESULTS[k][0] for k in NETWORK_LATENCY_RESULTS.keys()]
+    multi_core_scores = [NETWORK_LATENCY_RESULTS[k][1] for k in NETWORK_LATENCY_RESULTS.keys()]
+    with plt.xkcd():
+        fig, ax = plt.subplots()
+        ax.set_title(f"Network Latency", color=report_config["globals"]["colors"][0])
+        ax.set_xlabel("Score", color=report_config["globals"]["colors"][0])
+        y_values = np.arange(len(NETWORK_LATENCY_RESULTS))
+        ax.set_yticks(y_values + 0.2)  # Adjust y-ticks to be in the middle of the bars
+        ax.set_yticklabels(NETWORK_LATENCY_RESULTS.keys())
+        ax.barh(y_values - 0.2, single_core_scores, height=0.4, label="single core", color=report_config["globals"]["colors"][0])  # Adjust y-values and set height
+        ax.barh(y_values + 0.2, multi_core_scores, height=0.4, label="multi core", color=report_config["globals"]["colors"][1])  # Adjust y-values and set height
+        ax.grid(False, axis="x")
+        # ax.grid(True, axis="y", color=report_config["globals"]["colors"][0])
+        legend = ax.legend()
+        plt.tight_layout() 
+
+        fig, ax = graph_ci(report_config, fig, ax, legend)
+
+        plt.show()
         return fig, ax
 
 
@@ -219,6 +258,20 @@ def main(report):
 
         PRICING_RESULTS[contestant["name"]] = ℝ(contestant["price"]).to("USD / month")
 
+        network = contestant_yabs["iperf"]
+        def iperf_latency(measurement):
+            # return 1
+            # return ureg("1 ms")
+            try:
+                return ℝ(f'{measurement["latency"]}').to("ms")
+            except:
+                return ℝ("nan ms")
+
+        fios_latency = [iperf_latency(measurement) for measurement in network]
+        fios_latency = [q.magnitude for q in fios_latency if q.units == ureg("ms")]
+        IPERF_RESULTS[contestant["name"]] = fios_latency
+        print(f"{IPERF_RESULTS=}")
+
         # break
 
 
@@ -237,7 +290,7 @@ def main(report):
     REPORT_MARKDOWN += f"## Geekbench 6 results for {report_name} \n\n"
     REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
 
-    
+
     fig, ax = graph_fio(report_config, FIO_RESULTS)
     REPORT_MARKDOWN += f"## Disk speed results for {report_name} \n\n"
     REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
@@ -246,6 +299,9 @@ def main(report):
     fig, ax = graph_pricing(report_config, PRICING_RESULTS)
     REPORT_MARKDOWN += f"## Pricing results for {report_name} \n\n"
     REPORT_MARKDOWN += fig_to_svg(fig) + "\n\n"
+
+
+    fig, ax = graph_network_latency(report_config, IPERF_RESULTS)
 
 
     table = table_from_string_list(ALL_DATA, Alignment.CENTER)
