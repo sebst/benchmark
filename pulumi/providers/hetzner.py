@@ -31,8 +31,8 @@ def hetzner_program(key, size="cax11", region="fsn1-dc14", image="ubuntu-22.04")
             "benchmark-instance-hetzner",
             image=image,
             datacenter=region,
-            size=size,
-            ssh_keys=[ssh_key.fingerprint],
+            server_type=size,
+            ssh_keys=[ssh_key.id],
             user_data=cloud_init,
             opts=pulumi.ResourceOptions(depends_on=[ssh_key]),
         )
