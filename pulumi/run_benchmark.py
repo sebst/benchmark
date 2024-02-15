@@ -1,4 +1,3 @@
-
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
 
@@ -6,7 +5,7 @@ from cryptography.hazmat.backends import default_backend as crypto_default_backe
 from benchmark import setup
 
 from providers.digitalocean import digitalocean_program
-# from providers.hetzner import hetzner_program
+from providers.hetzner import hetzner_program
 from providers.linode import linode_program
 
 from plot import show_plots
@@ -15,15 +14,13 @@ from plot import show_plots
 def main():
     DATA = {}
     key = rsa.generate_private_key(
-        backend=crypto_default_backend(),
-        public_exponent=65537,
-        key_size=2048
+        backend=crypto_default_backend(), public_exponent=65537, key_size=2048
     )
     from threading import Thread
 
     threads = [
         Thread(target=setup, args=(DATA, "digitalocean", digitalocean_program(key))),
-        # Thread(target=setup, args=("hetzner", hetzner_program(key))),
+        Thread(target=setup, args=(DATA, "hetzner", hetzner_program(key))),
         Thread(target=setup, args=(DATA, "linode", linode_program(key))),
     ]
 

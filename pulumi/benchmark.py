@@ -4,6 +4,7 @@ import time
 import pulumi
 import paramiko
 
+
 def setup(DATA, provider, pulumi_program):
     workspace = pulumi.automation.LocalWorkspace()
     stack = pulumi.automation.create_or_select_stack(
