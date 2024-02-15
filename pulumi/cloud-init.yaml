@@ -1,18 +1,4 @@
 #cloud-config
-groups:
-  - sudo
-  - admin
-users:
-  - name: sebst
-    shell: /bin/bash
-    system: false
-    gecos: Bas
-    primary_group: sebst
-    groups: sudo, admin, docker
-    sudo: ALL=(ALL) NOPASSWD:ALL
-    ssh_import_id:
-      - 'gh:sebst'
-    lock_passwd: true
 write_files:
   - path: /root/benchmark.sh
     owner: root:root
