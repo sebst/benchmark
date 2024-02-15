@@ -1,13 +1,15 @@
+from base64 import b64encode
 import os
 import pulumi
-import pulumi_digitalocean
+import pulumi_linode
 from cryptography.hazmat.primitives import serialization as crypto_serialization
 
 CUR_DIR = os.path.dirname(os.path.realpath(__file__))
 with open(f"{CUR_DIR}/../cloud-init.yaml", "r") as f:
     cloud_init = f.read()
+cloud_init = b64encode(cloud_init.encode('utf-8')).decode('utf-8')
 
-def linode_program(key, size='s-2vcpu-4gb', region='sfo2', image='ubuntu-22-04-x64'):
+def linode_program(key, size='g6-standard-2', region='us-mia', image='linode/ubuntu22.04'):
     def run():
         private_key = key.private_bytes(
             crypto_serialization.Encoding.PEM,
@@ -20,22 +22,19 @@ def linode_program(key, size='s-2vcpu-4gb', region='sfo2', image='ubuntu-22-04-x
             crypto_serialization.PublicFormat.OpenSSH
         )
 
-        ssh_key = pulumi_digitalocean.SshKey("ssh-key", 
-            public_key=public_key.decode('utf-8'),
-        )
-
-        # Create a droplet
-        server = pulumi_digitalocean.Droplet('benchmark-instance-digitalocean',
+        # Create an instance
+        server = pulumi_linode.Instance('benchmark-instance-linode',
             image=image,
             region=region,
-            size=size,
-            ssh_keys=[ssh_key.fingerprint],
-            user_data=cloud_init,
-            opts=pulumi.ResourceOptions(depends_on=[ssh_key])
+            type=size,
+            private_ip=False,
+            authorized_keys=[public_key.decode('utf-8').strip()],
+            metadatas=[{"userData": cloud_init}],
+            opts=pulumi.ResourceOptions(depends_on=[])
         )
 
         # Export the IP address of the server
-        pulumi.export('ip', server.ipv4_address)
+        pulumi.export('ip', server.ip_address)
         pulumi.export('ssh_key_private', private_key.decode('utf-8'))
         pulumi.export('ssh_key_public', public_key.decode('utf-8'))
     return run

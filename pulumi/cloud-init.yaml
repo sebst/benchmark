@@ -1,5 +1,4 @@
 #cloud-config
-
 groups:
   - sudo
   - admin
@@ -21,9 +20,7 @@ write_files:
     content: |
       #!/usr/bin/env sh
 
-      echo "Running benchmark..."
-
-      curl -sL yabs.sh | bash -s -- -j -i -g
+      curl -sL yabs.sh | bash -s -- -j -g
 apt:
   conf: |
     APT::Install-Recommends "0";
@@ -35,36 +32,5 @@ apt:
 package_update: true
 package_upgrade: true
 packages:
-  - bind9-dnsutils
-  - binutils
-  - busybox
-  - bzip2
   - ca-certificates
   - curl
-  - file
-  - gettext-base
-  - gdb
-  - git
-  - git-extras
-  - git-man
-  - gnupg
-  - jo
-  - jq
-  - less
-  - libarchive-tools
-  - make
-  - man-db
-  - ncurses-bin
-  - net-tools
-  - openssh-client
-  - openssh-server
-  - procps
-  - psmisc
-  - rsync
-  - tar
-  - util-linux
-  - uuid-runtime
-  - unzip
-  - vim
-  - wget
-  - xz-utils
